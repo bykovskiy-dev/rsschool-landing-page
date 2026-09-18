@@ -168,7 +168,7 @@
 }
 
 .footer {
-  padding: 40px var(--layout-padding);
+  padding: 0 var(--layout-padding) 40px;
 }
 
 .footer__inner {
