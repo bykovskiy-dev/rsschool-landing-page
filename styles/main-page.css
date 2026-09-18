@@ -190,6 +190,7 @@
   cursor: pointer;
   transition:
     background-color 0.3s ease,
+    border-color 0.3s ease,
     color 0.3s ease;
 }
 
@@ -214,12 +215,15 @@
 
 @media (hover: hover) and (pointer: fine) {
   .slider__arrow:hover {
+    border-color: var(--border-inverse);
     background-color: var(--border-inverse);
     color: var(--text-inverse);
   }
 
   [data-theme="dark"] .slider__arrow:hover {
-    color: var(--bg-page);
+    border-color: var(--border-primary);
+    background-color: var(--border-primary);
+    color: var(--text-primary);
   }
 }
 
