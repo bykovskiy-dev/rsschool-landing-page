@@ -23,7 +23,13 @@
 
   /* Layout */
   --layout-max-width: 1440px;
-  --layout-padding: 40px;
+  --layout-padding: 16px;
+
+  /* Footer */
+  --footer-gap: 40px;
+  --footer-column-gap: 100px;
+  --footer-padding-block: 60px;
+  --footer-padding-inline: 16px;
 
   /* Typography — mobile first */
   --font-family: "Inter", sans-serif;
@@ -54,11 +60,26 @@
 
 @media (min-width: 768px) {
   :root {
+    --layout-padding: 40px;
+    --footer-gap: 100px;
+    --footer-padding-block: 100px;
+    --footer-padding-inline: 60px;
+  }
+}
+
+@media (min-width: 769px) {
+  :root {
     --font-size-heading-1: 72px;
     --line-height-heading-1: 105%;
 
     --font-size-heading-2: 60px;
     --line-height-heading-2: 125%;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --footer-padding-inline: 100px;
   }
 }
 
