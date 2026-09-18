@@ -1,0 +1,39 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Text */
+  --text-primary: #403f3d;
+  --text-inverse: #e1d4c9;
+  --text-accent: #b0907a;
+
+  /* Background */
+  --bg-page: #e1d4c9;
+  --bg-container: #665f55;
+  --bg-overlay: rgb(64 63 61 / 80%);
+
+  /* Border */
+  --border-primary: #c1b6ad;
+  --border-inverse: #665f55;
+}
+
+[data-theme="dark"] {
+  /* Text: dark-text-primary, dark-text-inverse, dark-text-accent */
+  --text-primary: #e1d4c9;
+  --text-inverse: #e1d4c9;
+  --text-accent: #b0907a;
+
+  /* Background: dark-bg-page, dark-bg-container, dark-bg-overlay */
+  --bg-page: #292826;
+  --bg-container: #403f3d;
+  --bg-overlay: rgb(41 40 38 / 80%);
+
+  /* Border: dark-border-primary, dark-border-inverse */
+  --border-primary: #665f55;
+  --border-inverse: #c1b6ad;
+}
