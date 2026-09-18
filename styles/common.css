@@ -131,6 +131,10 @@
   flex-shrink: 0;
 }
 
+.header__catalog-nav {
+  display: contents;
+}
+
 .header__menu {
   display: none;
   align-items: center;
