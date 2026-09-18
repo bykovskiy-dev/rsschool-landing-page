@@ -1,6 +1,5 @@
 const CONFIG_URL = "scripts/catalog.config.json";
 const PAGE_SIZE = 4;
-const DESKTOP_BREAKPOINT = "(min-width: 768px)";
 const FETCH_DELAY_MS = 1000;
 const NOTE_TEXT =
   "The cost is not final. Download our mobile app to see the final price and place your order. Earn loyalty points and enjoy your favorite coffee with up to 20% discount.";
@@ -293,7 +292,7 @@ const createCard = (item, onOpen) => {
 
 const initCatalog = async (root, productModal) => {
   const list = root.querySelector("[data-catalog-list]");
-  const sentinel = root.querySelector("[data-catalog-sentinel]");
+  const moreButton = root.querySelector("[data-catalog-more]");
   const loader = root.querySelector("[data-catalog-loader]");
   const category = root.dataset.category;
 
@@ -307,6 +306,10 @@ const initCatalog = async (root, productModal) => {
     if (loader) {
       loader.hidden = !isLoading;
       loader.setAttribute("aria-hidden", String(!isLoading));
+    }
+
+    if (moreButton && isLoading) {
+      moreButton.hidden = true;
     }
   };
 
@@ -324,96 +327,38 @@ const initCatalog = async (root, productModal) => {
 
   const catalog = await response.json();
   const items = catalog[category] ?? [];
+  let visibleCount = Math.min(PAGE_SIZE, items.length);
 
-  let renderedCount = 0;
-  let isLoading = false;
-  let observer = null;
+  const hasMore = () => visibleCount < items.length;
 
-  const hasMore = () => renderedCount < items.length;
-
-  const renderNext = (count = PAGE_SIZE) => {
-    if (isLoading || !hasMore()) {
+  const updateMoreButton = () => {
+    if (!moreButton) {
       return;
     }
 
-    isLoading = true;
+    moreButton.hidden = !hasMore();
+  };
 
-    const nextItems = items.slice(renderedCount, renderedCount + count);
+  const renderCards = () => {
     const fragment = document.createDocumentFragment();
 
-    nextItems.forEach((item) => {
+    items.slice(0, visibleCount).forEach((item) => {
       fragment.append(createCard(item, productModal.openModal));
     });
 
-    list.append(fragment);
-    renderedCount += nextItems.length;
-    isLoading = false;
-
-    if (!hasMore() && observer && sentinel) {
-      observer.unobserve(sentinel);
-    }
+    list.replaceChildren(fragment);
+    updateMoreButton();
   };
 
-  const fillViewport = () => {
-    while (hasMore() && sentinel && sentinel.getBoundingClientRect().top <= window.innerHeight) {
-      renderNext(PAGE_SIZE);
-    }
-  };
-
-  const showAll = () => {
-    if (renderedCount < items.length) {
-      renderNext(items.length - renderedCount);
-    }
-  };
-
-  const syncByViewport = () => {
-    if (window.matchMedia(DESKTOP_BREAKPOINT).matches) {
-      if (observer && sentinel) {
-        observer.unobserve(sentinel);
-      }
-
-      showAll();
-      return;
-    }
-
-    if (renderedCount === 0) {
-      renderNext(PAGE_SIZE);
-    }
-
-    if (observer && sentinel && hasMore()) {
-      observer.observe(sentinel);
-      fillViewport();
-    }
-  };
-
-  if (sentinel) {
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) {
-          return;
-        }
-
-        if (window.matchMedia(DESKTOP_BREAKPOINT).matches) {
-          return;
-        }
-
-        renderNext(PAGE_SIZE);
-        fillViewport();
-      },
-      {
-        root: null,
-        rootMargin: "0px 0px 200px 0px",
-        threshold: 0,
-      },
-    );
+  if (moreButton) {
+    moreButton.addEventListener("click", () => {
+      visibleCount = Math.min(visibleCount + PAGE_SIZE, items.length);
+      renderCards();
+    });
   }
 
-  syncByViewport();
+  renderCards();
   setLoading(false);
-
-  window.matchMedia(DESKTOP_BREAKPOINT).addEventListener("change", () => {
-    syncByViewport();
-  });
 };
 
 const productModal = initProductModal();
