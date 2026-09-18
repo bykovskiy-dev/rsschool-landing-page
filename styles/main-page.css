@@ -254,10 +254,6 @@
   }
 }
 
-.about {
-  padding-block: 100px;
-}
-
 .about__title {
   margin-bottom: 40px;
   text-align: left;
@@ -267,6 +263,7 @@
   display: flex;
   flex-direction: column;
   gap: 40px;
+  margin-bottom: 100px;
 }
 
 .about__column {
@@ -327,5 +324,166 @@
   .about__image--2,
   .about__image--3 {
     height: 430px;
+  }
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-bottom: 100px;
+}
+
+.app__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.app__title {
+  text-align: left;
+}
+
+.app__stores {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.app__store {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-width: 200px;
+  padding: 12px 26px 12px 20px;
+  border: 1px solid var(--border-inverse);
+  border-radius: 100px;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.app__store-icon {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+}
+
+.app__store-icon-img {
+  grid-area: 1 / 1;
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* Apple glyph has more empty space in the SVG; Play fills the box denser */
+.app__store-icon--ios .app__store-icon-img {
+  width: 36px;
+  height: 36px;
+  transform: scale(1.12);
+  transform-origin: center;
+}
+
+.app__store-icon--android .app__store-icon-img {
+  width: 36px;
+  height: 36px;
+  transform: scale(0.86);
+  transform-origin: center;
+}
+
+.app__store-icon-img--light {
+  opacity: 0;
+}
+
+.app__store-icon-img--dark {
+  opacity: 1;
+}
+
+[data-theme="dark"] .app__store-icon-img--dark {
+  opacity: 0;
+}
+
+[data-theme="dark"] .app__store-icon-img--light {
+  opacity: 1;
+}
+
+.app__store-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.app__store-name {
+  color: inherit;
+}
+
+.app__store-name.link::after {
+  display: none;
+}
+
+.app__media {
+  width: 100%;
+}
+
+.app__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app__store:hover {
+    background-color: var(--border-inverse);
+    color: var(--text-inverse);
+  }
+
+  [data-theme="dark"] .app__store:hover {
+    color: var(--bg-page);
+  }
+
+  .app__store:hover .app__store-icon-img--dark {
+    opacity: 0;
+  }
+
+  .app__store:hover .app__store-icon-img--light {
+    opacity: 1;
+  }
+
+  [data-theme="dark"] .app__store:hover .app__store-icon-img--dark {
+    opacity: 1;
+  }
+
+  [data-theme="dark"] .app__store:hover .app__store-icon-img--light {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .app__stores {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 100px;
+  }
+
+  .app__content {
+    max-width: 630px;
   }
 }
