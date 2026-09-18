@@ -23,8 +23,9 @@ const initSlider = (root) => {
   // [cloneLast, ...realSlides, cloneFirst]
   let currentIndex = 1;
   let isAnimating = false;
-  let touchStartX = 0;
-  let touchDeltaX = 0;
+  let pointerId = null;
+  let pointerStartX = 0;
+  let pointerDeltaX = 0;
 
   const getRealIndex = () => {
     if (currentIndex === 0) {
@@ -70,6 +71,24 @@ const initSlider = (root) => {
   const goPrev = () => goTo(currentIndex - 1);
   const goNext = () => goTo(currentIndex + 1);
 
+  const finishPointerSwipe = () => {
+    if (pointerId === null) {
+      return;
+    }
+
+    if (!isAnimating) {
+      if (pointerDeltaX > SWIPE_THRESHOLD) {
+        goPrev();
+      } else if (pointerDeltaX < -SWIPE_THRESHOLD) {
+        goNext();
+      }
+    }
+
+    pointerId = null;
+    pointerDeltaX = 0;
+    root.classList.remove("is-dragging");
+  };
+
   track.addEventListener("transitionend", (event) => {
     if (event.target !== track || event.propertyName !== "transform") {
       return;
@@ -89,41 +108,47 @@ const initSlider = (root) => {
   prevButton?.addEventListener("click", goPrev);
   nextButton?.addEventListener("click", goNext);
 
-  root.addEventListener(
-    "touchstart",
-    (event) => {
-      touchStartX = event.changedTouches[0].clientX;
-      touchDeltaX = 0;
-    },
-    { passive: true },
-  );
+  root.addEventListener("pointerdown", (event) => {
+    if (event.button !== undefined && event.button !== 0) {
+      return;
+    }
 
-  root.addEventListener(
-    "touchmove",
-    (event) => {
-      touchDeltaX = event.changedTouches[0].clientX - touchStartX;
-    },
-    { passive: true },
-  );
+    if (event.target.closest(".slider__arrow")) {
+      return;
+    }
 
-  root.addEventListener(
-    "touchend",
-    () => {
-      if (isAnimating) {
-        touchDeltaX = 0;
-        return;
-      }
+    pointerId = event.pointerId;
+    pointerStartX = event.clientX;
+    pointerDeltaX = 0;
+    root.classList.add("is-dragging");
+    root.setPointerCapture(event.pointerId);
+  });
 
-      if (touchDeltaX > SWIPE_THRESHOLD) {
-        goPrev();
-      } else if (touchDeltaX < -SWIPE_THRESHOLD) {
-        goNext();
-      }
+  root.addEventListener("pointermove", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
 
-      touchDeltaX = 0;
-    },
-    { passive: true },
-  );
+    pointerDeltaX = event.clientX - pointerStartX;
+  });
+
+  root.addEventListener("pointerup", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
+
+    finishPointerSwipe();
+  });
+
+  root.addEventListener("pointercancel", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
+
+    pointerId = null;
+    pointerDeltaX = 0;
+    root.classList.remove("is-dragging");
+  });
 
   setPosition(currentIndex, false);
   updateBullets();
