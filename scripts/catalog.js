@@ -262,7 +262,7 @@ const createCard = (item, onOpen) => {
   const body = document.createElement("div");
   body.className = "catalog-card__body";
 
-  const name = document.createElement("h3");
+  const name = document.createElement("h2");
   name.className = "heading-3 catalog-card__name";
   name.textContent = item.name;
 
