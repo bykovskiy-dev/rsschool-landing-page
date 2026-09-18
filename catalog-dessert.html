@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/global.css">
     <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/catalog-page.css">
     <script>
       (() => {
         const savedTheme = localStorage.getItem("theme");
@@ -88,7 +89,43 @@
       </div>
     </header>
 
-    <main class="main"></main>
+    <main class="main">
+      <section class="catalog" data-catalog data-category="dessert" aria-labelledby="catalog-title">
+        <h1 class="heading-2 catalog__title" id="catalog-title">
+          Behind each of our cups hides an <span class="heading-2--accent">amazing surprise</span>
+        </h1>
+
+        <nav class="catalog__tabs" aria-label="Menu categories">
+          <a class="catalog__tab" href="catalog-coffe.html">
+            <span class="catalog__tab-icon" aria-hidden="true">
+              <img src="images/categories/cat-coffe.png" alt="" width="16" height="16">
+            </span>
+            <span>Coffee</span>
+          </a>
+          <a class="catalog__tab" href="catalog-tea.html">
+            <span class="catalog__tab-icon" aria-hidden="true">
+              <img src="images/categories/cat-tea.png" alt="" width="16" height="16">
+            </span>
+            <span>Tea</span>
+          </a>
+          <a class="catalog__tab is-active" href="catalog-dessert.html" aria-current="page">
+            <span class="catalog__tab-icon" aria-hidden="true">
+              <img src="images/categories/cat-dessert.png" alt="" width="16" height="16">
+            </span>
+            <span>Dessert</span>
+          </a>
+        </nav>
+
+        <ul class="catalog__list" data-catalog-list></ul>
+        <div class="catalog__loader" data-catalog-loader aria-hidden="true" aria-label="Loading">
+          <svg class="catalog__loader-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M21.8883 13.5C21.1645 18.3113 17.013 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C16.1006 2 19.6248 4.46819 21.1679 8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17 8H21.4C21.7314 8 22 7.73137 22 7.4V3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="catalog__sentinel" data-catalog-sentinel aria-hidden="true"></div>
+      </section>
+    </main>
 
     <footer class="footer">
       <div class="footer__inner">
@@ -157,5 +194,6 @@
       </div>
     </footer>
     <script src="scripts/theme.js"></script>
+    <script src="scripts/catalog.js"></script>
   </body>
 </html>

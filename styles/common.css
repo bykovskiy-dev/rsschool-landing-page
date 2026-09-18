@@ -210,15 +210,18 @@
   height: 60px;
   border: 1px solid var(--text-inverse);
   border-radius: 100px;
+  background-color: transparent;
   color: var(--text-inverse);
   transition:
     background-color 0.3s ease,
+    border-color 0.3s ease,
     color 0.3s ease;
 }
 
 .footer__social-link:hover {
-  background-color: var(--text-inverse);
-  color: var(--bg-container);
+  border-color: var(--bg-page);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
 }
 
 .footer__contacts {
@@ -245,7 +248,7 @@
 a.footer__contact-link.link::after {
   top: auto;
   bottom: -4px;
-  height: 1px;
+  height: 2px;
 }
 
 .footer__contact-icon {
