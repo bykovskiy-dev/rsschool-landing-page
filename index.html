@@ -51,7 +51,7 @@
       </a>
       <nav class="header__nav" aria-label="Main">
         <ul class="header__nav-list">
-          <li><a class="link" href="#">Favorite coffee</a></li>
+          <li><a class="link" href="#favorite">Favorite coffee</a></li>
           <li><a class="link" href="#">About</a></li>
           <li><a class="link" href="#">Mobile app</a></li>
           <li><a class="link" href="#">Contact us</a></li>
@@ -123,6 +123,90 @@
           </a>
         </div>
       </section>
+
+      <section class="favorites" id="favorite" aria-labelledby="favorites-title">
+        <h2 class="heading-2 favorites__title" id="favorites-title">
+          Choose your <span class="heading-2--accent">favorite</span> coffee
+        </h2>
+
+        <div class="slider" data-slider>
+          <button class="slider__arrow slider__arrow--prev" type="button" aria-label="Previous slide">
+            <svg width="24" height="24" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.3 12H5.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 5.7 5.7 12 12 18.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="slider__viewport">
+            <ul class="slider__track">
+              <li class="slider__slide">
+                <img
+                  class="slider__image"
+                  src="images/slider/coffee-slider-1.png"
+                  alt="S’mores Frappuccino"
+                  width="480"
+                  height="480"
+                >
+                <div class="slider__content">
+                  <h3 class="heading-3 slider__name">S’mores Frappuccino</h3>
+                  <p class="medium slider__description">
+                    This new drink takes an espresso and mixes it with brown sugar and cinnamon
+                    before being topped with oat milk.
+                  </p>
+                  <p class="heading-3 slider__price">$5.50</p>
+                </div>
+              </li>
+              <li class="slider__slide">
+                <img
+                  class="slider__image"
+                  src="images/slider/coffee-slider-2.png"
+                  alt="Caramel Macchiato"
+                  width="480"
+                  height="480"
+                >
+                <div class="slider__content">
+                  <h3 class="heading-3 slider__name">Caramel Macchiato</h3>
+                  <p class="medium slider__description">
+                    Fragrant and unique classic espresso with rich caramel-peanut syrup,
+                    with cream under whipped thick foam.
+                  </p>
+                  <p class="heading-3 slider__price">$5.00</p>
+                </div>
+              </li>
+              <li class="slider__slide">
+                <img
+                  class="slider__image"
+                  src="images/slider/coffee-slider-3.png"
+                  alt="Ice coffee"
+                  width="480"
+                  height="480"
+                >
+                <div class="slider__content">
+                  <h3 class="heading-3 slider__name">Ice coffee</h3>
+                  <p class="medium slider__description">
+                    A popular summer drink that tones and invigorates.
+                    Prepared from coffee, milk and ice.
+                  </p>
+                  <p class="heading-3 slider__price">$4.50</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <button class="slider__arrow slider__arrow--next" type="button" aria-label="Next slide">
+            <svg width="24" height="24" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5.7 12h12.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 5.7 18.3 12 12 18.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="slider__pagination" aria-hidden="true">
+            <span class="slider__bullet is-active"></span>
+            <span class="slider__bullet"></span>
+            <span class="slider__bullet"></span>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
@@ -163,7 +247,7 @@
           <h3 class="footer__contacts-title heading-3">Contact us</h3>
           <ul class="footer__contacts-list">
             <li>
-              <a class="footer__contact-link" href="https://maps.google.com/?q=8558+Green+Rd.,+LA" target="_blank" rel="noopener noreferrer">
+              <a class="footer__contact-link link" href="https://maps.google.com/?q=8558+Green+Rd.,+LA" target="_blank" rel="noopener noreferrer">
                 <svg class="footer__contact-icon" width="20" height="20" aria-hidden="true" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 1.67A5.83 5.83 0 0 0 4.17 7.5C4.17 12.08 10 18.33 10 18.33s5.83-6.25 5.83-10.83A5.83 5.83 0 0 0 10 1.67Zm0 7.91a2.08 2.08 0 1 1 0-4.16 2.08 2.08 0 0 1 0 4.16Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -171,7 +255,7 @@
               </a>
             </li>
             <li>
-              <a class="footer__contact-link" href="tel:+16035550123">
+              <a class="footer__contact-link link" href="tel:+16035550123">
                 <svg class="footer__contact-icon" width="20" height="20" aria-hidden="true" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.5 14.15v2.08a1.67 1.67 0 0 1-1.82 1.67 16.5 16.5 0 0 1-7.2-2.56 16.25 16.25 0 0 1-5-5 16.5 16.5 0 0 1-2.56-7.27A1.67 1.67 0 0 1 2.58 1.67h2.08a1.67 1.67 0 0 1 1.67 1.43c.1.78.3 1.54.58 2.26a1.67 1.67 0 0 1-.38 1.76L5.7 8.28a13.33 13.33 0 0 0 5 5l1.16-.83a1.67 1.67 0 0 1 1.76-.38c.72.28 1.48.48 2.26.58a1.67 1.67 0 0 1 1.62 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -192,5 +276,6 @@
       </div>
     </footer>
     <script src="scripts/theme.js"></script>
+    <script src="scripts/slider.js"></script>
   </body>
 </html>
