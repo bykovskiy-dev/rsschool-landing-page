@@ -103,13 +103,19 @@
   cursor: pointer;
 }
 
+.catalog-card__frame {
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 40px;
+}
+
 .catalog-card__image {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   object-fit: cover;
-  border-radius: 40px;
+  transition: transform 0.4s ease;
 }
 
 .catalog-card__body {
@@ -208,6 +214,10 @@
   .catalog-card:hover {
     border-color: var(--bg-container);
     background-color: var(--bg-page);
+  }
+
+  .catalog-card:hover .catalog-card__image {
+    transform: scale(1.05);
   }
 }
 

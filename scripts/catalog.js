@@ -288,6 +288,9 @@ const createCard = (item, onOpen) => {
   card.tabIndex = 0;
   card.setAttribute("aria-label", `Open details for ${item.name}`);
 
+  const frame = document.createElement("div");
+  frame.className = "catalog-card__frame";
+
   const image = document.createElement("img");
   image.className = "catalog-card__image";
   image.src = item.image;
@@ -295,6 +298,8 @@ const createCard = (item, onOpen) => {
   image.width = 340;
   image.height = 340;
   image.loading = "lazy";
+
+  frame.append(image);
 
   const body = document.createElement("div");
   body.className = "catalog-card__body";
@@ -312,7 +317,7 @@ const createCard = (item, onOpen) => {
   price.textContent = formatPrice(parsePrice(item.price));
 
   body.append(name, description, price);
-  card.append(image, body);
+  card.append(frame, body);
 
   const open = () => onOpen(item);
 
