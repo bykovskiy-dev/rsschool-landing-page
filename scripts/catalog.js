@@ -1,4 +1,4 @@
-const CONFIG_URL = "scripts/catalog.config.json";
+const CONFIG_URL = "scripts/products.json";
 const PAGE_SIZE = 4;
 const MOBILE_MEDIA = "(max-width: 768px)";
 const NOTE_TEXT =
@@ -207,12 +207,16 @@ const initProductModal = () => {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
 
-    const onFadeOut = (event) => {
-      if (event.target !== modal || event.propertyName !== "opacity") {
+    let isSettled = false;
+
+    const settleClose = () => {
+      if (isSettled) {
         return;
       }
 
+      isSettled = true;
       modal.removeEventListener("transitionend", onFadeOut);
+      window.clearTimeout(fallbackTimer);
       isClosing = false;
       unlockScroll();
 
@@ -220,6 +224,16 @@ const initProductModal = () => {
         lastFocusedElement.focus();
       }
     };
+
+    const onFadeOut = (event) => {
+      if (event.target !== modal || event.propertyName !== "opacity") {
+        return;
+      }
+
+      settleClose();
+    };
+
+    const fallbackTimer = window.setTimeout(settleClose, 350);
 
     modal.addEventListener("transitionend", onFadeOut);
   };
