@@ -1,16 +1,39 @@
-const CONFIG_URL = "scripts/catalog.config.json";
+const CONFIG_URL = "scripts/products.json";
 const PAGE_SIZE = 4;
-const FETCH_DELAY_MS = 1000;
+const MOBILE_MEDIA = "(max-width: 768px)";
 const NOTE_TEXT =
   "The cost is not final. Download our mobile app to see the final price and place your order. Earn loyalty points and enjoy your favorite coffee with up to 20% discount.";
-
-const delay = (ms) => new Promise((resolve) => {
-  setTimeout(resolve, ms);
-});
 
 const formatPrice = (value) => `$${value.toFixed(2)}`;
 
 const parsePrice = (value) => Number.parseFloat(value) || 0;
+
+const getProductImage = (category, index) =>
+  `images/catalog/${category}-${index + 1}.jpg`;
+
+const loadProducts = async () => {
+  const response = await fetch(CONFIG_URL);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load catalog config: ${response.status}`);
+  }
+
+  const products = await response.json();
+
+  if (!Array.isArray(products)) {
+    throw new Error("Catalog config must be an array of products");
+  }
+
+  return products;
+};
+
+const getProductsByCategory = (products, category) =>
+  products
+    .filter((item) => item.category === category)
+    .map((item, index) => ({
+      ...item,
+      image: getProductImage(category, index),
+    }));
 
 const createOptionButton = ({ mark, label, isActive = false }) => {
   const button = document.createElement("button");
@@ -184,12 +207,16 @@ const initProductModal = () => {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
 
-    const onFadeOut = (event) => {
-      if (event.target !== modal || event.propertyName !== "opacity") {
+    let isSettled = false;
+
+    const settleClose = () => {
+      if (isSettled) {
         return;
       }
 
+      isSettled = true;
       modal.removeEventListener("transitionend", onFadeOut);
+      window.clearTimeout(fallbackTimer);
       isClosing = false;
       unlockScroll();
 
@@ -197,6 +224,16 @@ const initProductModal = () => {
         lastFocusedElement.focus();
       }
     };
+
+    const onFadeOut = (event) => {
+      if (event.target !== modal || event.propertyName !== "opacity") {
+        return;
+      }
+
+      settleClose();
+    };
+
+    const fallbackTimer = window.setTimeout(settleClose, 350);
 
     modal.addEventListener("transitionend", onFadeOut);
   };
@@ -251,6 +288,9 @@ const createCard = (item, onOpen) => {
   card.tabIndex = 0;
   card.setAttribute("aria-label", `Open details for ${item.name}`);
 
+  const frame = document.createElement("div");
+  frame.className = "catalog-card__frame";
+
   const image = document.createElement("img");
   image.className = "catalog-card__image";
   image.src = item.image;
@@ -258,6 +298,8 @@ const createCard = (item, onOpen) => {
   image.width = 340;
   image.height = 340;
   image.loading = "lazy";
+
+  frame.append(image);
 
   const body = document.createElement("div");
   body.className = "catalog-card__body";
@@ -272,10 +314,10 @@ const createCard = (item, onOpen) => {
 
   const price = document.createElement("p");
   price.className = "heading-3 catalog-card__price";
-  price.textContent = `$${item.price}`;
+  price.textContent = formatPrice(parsePrice(item.price));
 
   body.append(name, description, price);
-  card.append(image, body);
+  card.append(frame, body);
 
   const open = () => onOpen(item);
 
@@ -294,11 +336,27 @@ const initCatalog = async (root, productModal) => {
   const list = root.querySelector("[data-catalog-list]");
   const moreButton = root.querySelector("[data-catalog-more]");
   const loader = root.querySelector("[data-catalog-loader]");
-  const category = root.dataset.category;
+  const tabs = [...root.querySelectorAll("[data-category-tab]")];
+  const mobileMedia = window.matchMedia(MOBILE_MEDIA);
 
-  if (!list || !category) {
+  if (!list) {
     return;
   }
+
+  let products = [];
+  let category = root.dataset.category || tabs[0]?.dataset.categoryTab || "coffee";
+  let items = [];
+  let isExpanded = false;
+
+  const isMobile = () => mobileMedia.matches;
+
+  const getVisibleCount = () => {
+    if (!isMobile() || isExpanded) {
+      return items.length;
+    }
+
+    return Math.min(PAGE_SIZE, items.length);
+  };
 
   const setLoading = (isLoading) => {
     root.classList.toggle("is-loading", isLoading);
@@ -313,34 +371,25 @@ const initCatalog = async (root, productModal) => {
     }
   };
 
-  setLoading(true);
-
-  const [response] = await Promise.all([
-    fetch(CONFIG_URL),
-    delay(FETCH_DELAY_MS),
-  ]);
-
-  if (!response.ok) {
-    setLoading(false);
-    throw new Error(`Failed to load catalog config: ${response.status}`);
-  }
-
-  const catalog = await response.json();
-  const items = catalog[category] ?? [];
-  let visibleCount = Math.min(PAGE_SIZE, items.length);
-
-  const hasMore = () => visibleCount < items.length;
+  const updateTabs = () => {
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.categoryTab === category;
+      tab.classList.toggle("is-active", isActive);
+      tab.setAttribute("aria-pressed", String(isActive));
+    });
+  };
 
   const updateMoreButton = () => {
     if (!moreButton) {
       return;
     }
 
-    moreButton.hidden = !hasMore();
+    moreButton.hidden = !(isMobile() && !isExpanded && items.length > PAGE_SIZE);
   };
 
   const renderCards = () => {
     const fragment = document.createDocumentFragment();
+    const visibleCount = getVisibleCount();
 
     items.slice(0, visibleCount).forEach((item) => {
       fragment.append(createCard(item, productModal.openModal));
@@ -350,15 +399,63 @@ const initCatalog = async (root, productModal) => {
     updateMoreButton();
   };
 
+  const setCategory = (nextCategory) => {
+    if (!nextCategory) {
+      return;
+    }
+
+    category = nextCategory;
+    root.dataset.category = category;
+    items = getProductsByCategory(products, category);
+    isExpanded = false;
+    updateTabs();
+    renderCards();
+  };
+
+  setLoading(true);
+
+  try {
+    products = await loadProducts();
+  } catch (error) {
+    setLoading(false);
+    throw error;
+  }
+
+  setCategory(category);
+  setLoading(false);
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const nextCategory = tab.dataset.categoryTab;
+
+      if (!nextCategory || nextCategory === category) {
+        return;
+      }
+
+      setCategory(nextCategory);
+    });
+  });
+
   if (moreButton) {
     moreButton.addEventListener("click", () => {
-      visibleCount = Math.min(visibleCount + PAGE_SIZE, items.length);
+      isExpanded = true;
       renderCards();
     });
   }
 
-  renderCards();
-  setLoading(false);
+  const onViewportChange = () => {
+    if (!isMobile()) {
+      isExpanded = false;
+    }
+
+    renderCards();
+  };
+
+  if (typeof mobileMedia.addEventListener === "function") {
+    mobileMedia.addEventListener("change", onViewportChange);
+  } else {
+    mobileMedia.addListener(onViewportChange);
+  }
 };
 
 const productModal = initProductModal();

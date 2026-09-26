@@ -1,4 +1,6 @@
 const SWIPE_THRESHOLD = 50;
+const AUTOPLAY_MS = 5000;
+const SLIDE_TRANSITION_FALLBACK_MS = 700;
 
 const initSlider = (root) => {
   const track = root.querySelector(".slider__track");
@@ -10,6 +12,17 @@ const initSlider = (root) => {
   if (!track || realSlides.length === 0) {
     return;
   }
+
+  bullets.forEach((bullet) => {
+    if (bullet.querySelector(".slider__bullet-fill")) {
+      return;
+    }
+
+    const fill = document.createElement("span");
+    fill.className = "slider__bullet-fill";
+    fill.setAttribute("aria-hidden", "true");
+    bullet.append(fill);
+  });
 
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realSlides.length - 1].cloneNode(true);
@@ -26,6 +39,8 @@ const initSlider = (root) => {
   let pointerId = null;
   let pointerStartX = 0;
   let pointerDeltaX = 0;
+  let transitionFallbackTimer = null;
+  let autoplayTimer = null;
 
   const getRealIndex = () => {
     if (currentIndex === 0) {
@@ -39,11 +54,20 @@ const initSlider = (root) => {
     return currentIndex - 1;
   };
 
-  const updateBullets = () => {
+  const syncActiveBullet = () => {
     const realIndex = getRealIndex();
 
     bullets.forEach((bullet, bulletIndex) => {
-      bullet.classList.toggle("is-active", bulletIndex === realIndex);
+      const isActive = bulletIndex === realIndex;
+      bullet.classList.remove("is-active");
+
+      if (!isActive) {
+        return;
+      }
+
+      // Force CSS progress animation restart.
+      void bullet.offsetWidth;
+      bullet.classList.add("is-active");
     });
   };
 
@@ -57,6 +81,57 @@ const initSlider = (root) => {
     }
   };
 
+  const stopAutoplay = () => {
+    if (autoplayTimer !== null) {
+      window.clearTimeout(autoplayTimer);
+      autoplayTimer = null;
+    }
+  };
+
+  const scheduleAutoplay = () => {
+    stopAutoplay();
+
+    if (document.hidden) {
+      return;
+    }
+
+    autoplayTimer = window.setTimeout(() => {
+      autoplayTimer = null;
+
+      if (document.hidden) {
+        return;
+      }
+
+      if (isAnimating) {
+        scheduleAutoplay();
+        return;
+      }
+
+      goNext();
+    }, AUTOPLAY_MS);
+  };
+
+  const finishTransition = () => {
+    if (!isAnimating) {
+      return;
+    }
+
+    if (transitionFallbackTimer !== null) {
+      window.clearTimeout(transitionFallbackTimer);
+      transitionFallbackTimer = null;
+    }
+
+    if (currentIndex === 0) {
+      currentIndex = realSlides.length;
+      setPosition(currentIndex, false);
+    } else if (currentIndex === realSlides.length + 1) {
+      currentIndex = 1;
+      setPosition(currentIndex, false);
+    }
+
+    isAnimating = false;
+  };
+
   const goTo = (index) => {
     if (isAnimating) {
       return;
@@ -65,7 +140,19 @@ const initSlider = (root) => {
     isAnimating = true;
     currentIndex = index;
     setPosition(currentIndex, true);
-    updateBullets();
+    // Switch indicator and restart progress with slide animation start.
+    syncActiveBullet();
+    // Reset autoplay countdown on every switch (manual or auto).
+    scheduleAutoplay();
+
+    if (transitionFallbackTimer !== null) {
+      window.clearTimeout(transitionFallbackTimer);
+    }
+
+    transitionFallbackTimer = window.setTimeout(
+      finishTransition,
+      SLIDE_TRANSITION_FALLBACK_MS,
+    );
   };
 
   const goPrev = () => goTo(currentIndex - 1);
@@ -81,6 +168,10 @@ const initSlider = (root) => {
         goPrev();
       } else if (pointerDeltaX < -SWIPE_THRESHOLD) {
         goNext();
+      } else {
+        // Swipe cancelled: keep current slide, but still restart countdown.
+        scheduleAutoplay();
+        syncActiveBullet();
       }
     }
 
@@ -94,15 +185,7 @@ const initSlider = (root) => {
       return;
     }
 
-    if (currentIndex === 0) {
-      currentIndex = realSlides.length;
-      setPosition(currentIndex, false);
-    } else if (currentIndex === realSlides.length + 1) {
-      currentIndex = 1;
-      setPosition(currentIndex, false);
-    }
-
-    isAnimating = false;
+    finishTransition();
   });
 
   prevButton?.addEventListener("click", goPrev);
@@ -117,6 +200,8 @@ const initSlider = (root) => {
       return;
     }
 
+    // Pause countdown while user interacts.
+    stopAutoplay();
     pointerId = event.pointerId;
     pointerStartX = event.clientX;
     pointerDeltaX = 0;
@@ -148,10 +233,23 @@ const initSlider = (root) => {
     pointerId = null;
     pointerDeltaX = 0;
     root.classList.remove("is-dragging");
+    scheduleAutoplay();
+    syncActiveBullet();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopAutoplay();
+      return;
+    }
+
+    scheduleAutoplay();
+    syncActiveBullet();
   });
 
   setPosition(currentIndex, false);
-  updateBullets();
+  syncActiveBullet();
+  scheduleAutoplay();
 };
 
 document.querySelectorAll("[data-slider]").forEach(initSlider);

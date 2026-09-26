@@ -30,8 +30,11 @@
   padding: 8px 16px 8px 8px;
   border: 1px solid var(--border-primary);
   border-radius: 100px;
+  background-color: transparent;
   color: var(--text-primary);
+  font: inherit;
   text-decoration: none;
+  cursor: pointer;
   transition:
     background-color 0.3s ease,
     color 0.3s ease,
@@ -85,7 +88,7 @@
 .catalog__list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 40px;
+  gap: var(--layout-padding);
   width: 100%;
   list-style: none;
 }
@@ -100,13 +103,19 @@
   cursor: pointer;
 }
 
+.catalog-card__frame {
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 40px;
+}
+
 .catalog-card__image {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   object-fit: cover;
-  border-radius: 40px;
+  transition: transform 0.4s ease;
 }
 
 .catalog-card__body {
@@ -205,6 +214,10 @@
   .catalog-card:hover {
     border-color: var(--bg-container);
     background-color: var(--bg-page);
+  }
+
+  .catalog-card:hover .catalog-card__image {
+    transform: scale(1.05);
   }
 }
 
